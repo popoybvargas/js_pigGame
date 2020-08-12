@@ -11,7 +11,7 @@ GAME RULES:
 
 /* VARIABLES */
 const winScore = 50;
-let dice, activePlayer, roundScore, globalScores, totalCurrentScore;
+let dice, activePlayer, roundScore, globalScores, totalCurrentScore, gotWinner;
 
 /* DOM ELEMENTS */
 const playerPanel0 = document.querySelector('.player-0-panel');
@@ -30,13 +30,18 @@ const newGame = () => {
 	roundScore = 0;
 	globalScores = [0, 0];
 	totalCurrentScore = 0;
+	gotWinner = false;
 	globalScoreDOM0.textContent = 0;
 	globalScoreDOM1.textContent = 0;
 	currentScoreDOM0.textContent = 0;
 	currentScoreDOM1.textContent = 0;
 	diceImgDOM.style.display = 'none';
+	document.getElementById('name-0').textContent = 'Player 1';
+	document.getElementById('name-1').textContent = 'Player 2';
 	playerPanel0.classList.add('active');
 	playerPanel1.classList.remove('active');
+	rollDiceDOM.disabled = false;
+	holdDOM.disabled = false;
 };
 newGame();
 
@@ -54,7 +59,10 @@ const swithchTurn = () => {
 
 const winCheck = () => {
 	if (totalCurrentScore >= winScore) {
-		alert(`Player ${activePlayer + 1} wins!`);
+		document.getElementById(`name-${activePlayer}`).textContent = 'Winner!';
+		rollDiceDOM.disabled = true;
+		holdDOM.disabled = true;
+		gotWinner = true;
 		holdScore();
 	}
 };
@@ -79,7 +87,8 @@ rollDiceDOM.addEventListener('click', rollDice);
 const holdScore = () => {
 	globalScores[activePlayer] = totalCurrentScore;
 	isPlayer1() ? globalScoreDOM0.textContent = totalCurrentScore : globalScoreDOM1.textContent = totalCurrentScore;
-	swithchTurn();
+
+	if (!gotWinner) swithchTurn();
 };
 holdDOM.addEventListener('click', holdScore);
 
