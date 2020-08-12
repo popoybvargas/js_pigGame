@@ -25,7 +25,12 @@ const rollDiceDOM = document.querySelector('button.btn-roll');
 const holdDOM = document.querySelector('button.btn-hold');
 const newGameDOM = document.querySelector('button.btn-new');
 
-const newGame = () => {
+const init = () => {
+	if (gotWinner) {
+		isPlayer1() ? playerPanel0.classList.remove('winner') : playerPanel1.classList.remove('winner');
+		isPlayer1() ? playerPanel0.classList.remove('active') : playerPanel1.classList.remove('active');
+		isPlayer1() ? document.getElementById('name-0').textContent = 'Player 1' : document.getElementById('name-1').textContent = 'Player 2';
+	}
 	activePlayer = 0;
 	roundScore = 0;
 	globalScores = [0, 0];
@@ -36,14 +41,10 @@ const newGame = () => {
 	currentScoreDOM0.textContent = 0;
 	currentScoreDOM1.textContent = 0;
 	diceImgDOM.style.display = 'none';
-	document.getElementById('name-0').textContent = 'Player 1';
-	document.getElementById('name-1').textContent = 'Player 2';
 	playerPanel0.classList.add('active');
-	playerPanel1.classList.remove('active');
-	rollDiceDOM.disabled = false;
 	holdDOM.disabled = false;
 };
-newGame();
+init();
 
 const isPlayer1 = () => activePlayer === 0;
 
@@ -60,7 +61,8 @@ const swithchTurn = () => {
 const winCheck = () => {
 	if (totalCurrentScore >= winScore) {
 		document.getElementById(`name-${activePlayer}`).textContent = 'Winner!';
-		rollDiceDOM.disabled = true;
+		isPlayer1() ? playerPanel0.classList.remove('active') : playerPanel1.classList.remove('active');
+		isPlayer1() ? playerPanel0.classList.add('winner') : playerPanel1.classList.add('winner');
 		holdDOM.disabled = true;
 		gotWinner = true;
 		holdScore();
@@ -68,19 +70,21 @@ const winCheck = () => {
 };
 
 const rollDice = () => {
-	diceImgDOM.style.display = 'none';
-	dice = Math.ceil(Math.random() * 6);
-	diceImgDOM.src = `dice-${dice}.png`;
-	window.setTimeout(() => {
-		diceImgDOM.style.display = 'block';
+	if (!gotWinner) {
+		diceImgDOM.style.display = 'none';
+		dice = Math.ceil(Math.random() * 6);
+		diceImgDOM.src = `dice-${dice}.png`;
+		window.setTimeout(() => {
+			diceImgDOM.style.display = 'block';
 
-		if (dice > 1) {
-			roundScore += dice;
-			isPlayer1() ? currentScoreDOM0.textContent = roundScore : currentScoreDOM1.textContent = roundScore;
-			totalCurrentScore = (document.getElementById(`score-${activePlayer}`).textContent * 1) + roundScore;
-			winCheck();
-		} else { swithchTurn(); }
-	}, 250);
+			if (dice > 1) {
+				roundScore += dice;
+				isPlayer1() ? currentScoreDOM0.textContent = roundScore : currentScoreDOM1.textContent = roundScore;
+				totalCurrentScore = (document.getElementById(`score-${activePlayer}`).textContent * 1) + roundScore;
+				winCheck();
+			} else { swithchTurn(); }
+		}, 250);
+	}
 };
 rollDiceDOM.addEventListener('click', rollDice);
 
@@ -92,4 +96,4 @@ const holdScore = () => {
 };
 holdDOM.addEventListener('click', holdScore);
 
-newGameDOM.addEventListener('click', newGame);
+newGameDOM.addEventListener('click', init);
