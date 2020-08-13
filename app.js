@@ -10,7 +10,7 @@ GAME RULES:
 */
 
 /* VARIABLES */
-const winScore = 50;
+const winScore = 20;
 let dice, activePlayer, roundScore, globalScores, totalCurrentScore, gotWinner, previousDice;
 
 /* DOM ELEMENTS */
@@ -25,11 +25,14 @@ const rollDiceDOM = document.querySelector('button.btn-roll');
 const holdDOM = document.querySelector('button.btn-hold');
 const newGameDOM = document.querySelector('button.btn-new');
 
+window.setGlobalScoreForPlayer0 = () => globalScoreDOM0.textContent = totalCurrentScore;
+function setGlobalScoreForPlayer1() { globalScoreDOM1.textContent = totalCurrentScore; }
+
 const init = () => {
 	if (gotWinner) {
-		isPlayer1() ? playerPanel0.classList.remove('winner') : playerPanel1.classList.remove('winner');
-		isPlayer1() ? playerPanel0.classList.remove('active') : playerPanel1.classList.remove('active');
-		isPlayer1() ? document.getElementById('name-0').textContent = 'Player 1' : document.getElementById('name-1').textContent = 'Player 2';
+		document.querySelector(`.player-${activePlayer}-panel`).classList.remove('winner');
+		document.querySelector(`.player-${activePlayer}-panel`).classList.remove('active');
+		document.getElementById(`name-${activePlayer}`).textContent = `Player ${activePlayer + 1}`;
 	}
 	activePlayer = 0;
 	roundScore = 0;
@@ -48,11 +51,6 @@ const init = () => {
 };
 init();
 
-function setGlobalScoreForPlayer0() { globalScoreDOM0.textContent = totalCurrentScore; }
-function setGlobalScoreForPlayer1() { globalScoreDOM1.textContent = totalCurrentScore; }
-
-const isPlayer1 = () => activePlayer === 0;
-
 const swithchTurn = () => {
 	playerPanel0.classList.toggle('active');
 	playerPanel1.classList.toggle('active');
@@ -60,14 +58,14 @@ const swithchTurn = () => {
 	totalCurrentScore = 0;
 	currentScoreDOM0.textContent = 0;
 	currentScoreDOM1.textContent = 0;
-	isPlayer1() ? activePlayer = 1 : activePlayer = 0;
+	activePlayer = activePlayer === 0 ? 1 : 0;
 };
 
 const winCheck = () => {
 	if (totalCurrentScore >= winScore) {
 		document.getElementById(`name-${activePlayer}`).textContent = 'Winner!';
-		isPlayer1() ? playerPanel0.classList.remove('active') : playerPanel1.classList.remove('active');
-		isPlayer1() ? playerPanel0.classList.add('winner') : playerPanel1.classList.add('winner');
+		document.querySelector(`.player-${activePlayer}-panel`).classList.remove('active');
+		document.querySelector(`.player-${activePlayer}-panel`).classList.add('winner');
 		holdDOM.disabled = true;
 		gotWinner = true;
 		holdScore();
@@ -85,7 +83,7 @@ const rollDice = () => {
 			if (dice > 1) {
 				previousDice = dice;
 				roundScore += dice;
-				isPlayer1() ? currentScoreDOM0.textContent = roundScore : currentScoreDOM1.textContent = roundScore;
+				document.getElementById(`current-${activePlayer}`).textContent = roundScore;
 				totalCurrentScore = (document.getElementById(`score-${activePlayer}`).textContent * 1) + roundScore;
 				winCheck();
 			} else { swithchTurn(); }
