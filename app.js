@@ -10,7 +10,7 @@ GAME RULES:
 */
 
 /* VARIABLES */
-const winScore = 20;
+const winScore = 100;
 let dice, activePlayer, roundScore, globalScores, totalCurrentScore, gotWinner, previousDice;
 
 /* DOM ELEMENTS */
@@ -51,11 +51,17 @@ const init = () => {
 };
 init();
 
-const swithchTurn = () => {
+const switchTurn = (rolled2Sixes = false) => {
 	playerPanel0.classList.toggle('active');
 	playerPanel1.classList.toggle('active');
+	previousDice = 0;
 	roundScore = 0;
 	totalCurrentScore = 0;
+
+	if (rolled2Sixes) {
+		globalScores[activePlayer] = 0;
+		window[`setGlobalScoreForPlayer${activePlayer}`]();
+	}
 	currentScoreDOM0.textContent = 0;
 	currentScoreDOM1.textContent = 0;
 	activePlayer = activePlayer === 0 ? 1 : 0;
@@ -81,12 +87,14 @@ const rollDice = () => {
 			diceImgDOM.style.display = 'block';
 
 			if (dice > 1) {
+				if (previousDice === 6 && dice === 6) switchTurn(true);
+
 				previousDice = dice;
 				roundScore += dice;
 				document.getElementById(`current-${activePlayer}`).textContent = roundScore;
 				totalCurrentScore = (document.getElementById(`score-${activePlayer}`).textContent * 1) + roundScore;
 				winCheck();
-			} else { swithchTurn(); }
+			} else { switchTurn(); }
 		}, 250);
 	}
 };
@@ -96,7 +104,7 @@ const holdScore = () => {
 	globalScores[activePlayer] = totalCurrentScore;
 	window[`setGlobalScoreForPlayer${activePlayer}`]();
 
-	if (!gotWinner) swithchTurn();
+	if (!gotWinner) switchTurn();
 };
 holdDOM.addEventListener('click', holdScore);
 
