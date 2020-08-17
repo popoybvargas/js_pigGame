@@ -33,9 +33,14 @@
             <button class="btn-roll"><i class="ion-ios-loop"></i>Roll dice</button>
             <button class="btn-hold"><i class="ion-ios-download-outline"></i>Hold</button>
 
-            <input type="text" class="final-score" placeholder="Final Score">
+            <label id="finalScoreLabel" for="targetScore">Target Score</label>
+            <input type="text" id="targetScore" class="target-score" placeholder="Target Score" value="100">
             
-            <img src="dice-5.png" alt="Dice" class="dice">
+            <!-- <img src="dice-5.png" alt="Dice" class="dice"> -->
+            <div id="dices">
+                <img src="dice-5.png" alt="Dice" class="dice-1">
+                <img src="dice-5.png" alt="Dice" class="dice-2">
+            </div>
         </div>
         
         <script src="app.js"></script>

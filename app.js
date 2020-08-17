@@ -10,7 +10,7 @@ GAME RULES:
 */
 
 /* VARIABLES */
-let dice, activePlayer, roundScore, globalScores, totalCurrentScore, gotWinner, previousDice, finalScore;
+let dice, dice1, dice2, activePlayer, roundScore, globalScores, totalCurrentScore, gotWinner, previousDice, targetScore;
 
 /* DOM ELEMENTS */
 const playerPanel0 = document.querySelector('.player-0-panel');
@@ -19,11 +19,14 @@ const globalScoreDOM0 = document.getElementById('score-0');
 const globalScoreDOM1 = document.getElementById('score-1');
 const currentScoreDOM0 = document.getElementById('current-0');
 const currentScoreDOM1 = document.getElementById('current-1');
-const diceImgDOM = document.querySelector('img.dice');
+// const diceImgDOM = document.querySelector('img.dice');
+const diceImgsDOM = document.getElementById( 'dices' );
+const dice1ImgDOM = document.querySelector('img.dice-1');
+const dice2ImgDOM = document.querySelector('img.dice-2');
 const rollDiceDOM = document.querySelector('button.btn-roll');
 const holdDOM = document.querySelector('button.btn-hold');
 const newGameDOM = document.querySelector('button.btn-new');
-const finalScoreDOM = document.querySelector( '.final-score' );
+const targetScoreDOM = document.querySelector( '.target-score' );
 
 window.setGlobalScoreForPlayer0 = () => globalScoreDOM0.textContent = totalCurrentScore;
 function setGlobalScoreForPlayer1() { globalScoreDOM1.textContent = totalCurrentScore; }
@@ -40,37 +43,44 @@ const init = () => {
 	totalCurrentScore = 0;
 	gotWinner = false;
 	dice = 0;
+	dice1 = 0;
+	dice2 = 0;
 	previousDice = 0;
 	globalScoreDOM0.textContent = 0;
 	globalScoreDOM1.textContent = 0;
 	currentScoreDOM0.textContent = 0;
 	currentScoreDOM1.textContent = 0;
-	diceImgDOM.style.display = 'none';
+	// diceImgDOM.style.display = 'none';
+	diceImgsDOM.style.display = 'none';
 	playerPanel0.classList.add('active');
 	holdDOM.disabled = false;
-	finalScoreDOM.disabled = false;
-	finalScoreDOM.select();
-	finalScoreDOM.focus();
+	targetScoreDOM.disabled = false;
+	targetScoreDOM.select();
+	targetScoreDOM.focus();
 };
 init();
 
-finalScoreDOM.addEventListener( 'focusout', () =>
+targetScoreDOM.addEventListener( 'focusout', () =>
 {
-	if ( ! finalScoreDOM.value ) finalScoreDOM.value = 100;
+	const targetScoreInput = targetScoreDOM.value;
 
-	finalScore = finalScoreDOM.value;
-	finalScoreDOM.disabled = true;
+	if ( ! targetScoreInput || isNaN( targetScoreInput ) || targetScoreInput < 13 ) targetScoreDOM.value = 100;
+
+	targetScore = targetScoreInput;
+	targetScoreDOM.disabled = true;
 });
 
-const switchTurn = (rolled2Sixes = false) => {
+const switchTurn = ( rolled2Sixes = false ) =>
+{
 	playerPanel0.classList.toggle('active');
 	playerPanel1.classList.toggle('active');
 	previousDice = 0;
 	roundScore = 0;
 	totalCurrentScore = 0;
 
-	if (rolled2Sixes) {
-		globalScores[activePlayer] = 0;
+	if ( rolled2Sixes )
+	{
+		globalScores[ activePlayer ] = 0;
 		window[`setGlobalScoreForPlayer${activePlayer}`]();
 	}
 	currentScoreDOM0.textContent = 0;
@@ -79,7 +89,7 @@ const switchTurn = (rolled2Sixes = false) => {
 };
 
 const winCheck = () => {
-	if ( totalCurrentScore >= ( finalScoreDOM.value || 100 ) )
+	if ( totalCurrentScore >= ( targetScoreDOM.value || 100 ) )
 	{
 		document.getElementById(`name-${activePlayer}`).textContent = 'Winner!';
 		document.querySelector(`.player-${activePlayer}-panel`).classList.remove('active');
@@ -92,22 +102,28 @@ const winCheck = () => {
 
 const rollDice = () =>
 {
-	gameStarted = true;
-	if ( ! finalScoreDOM.value ) finalScoreDOM.value = 100;
-	if ( ! finalScoreDOM.disabled ) finalScoreDOM.disabled = true;
-
 	if (!gotWinner) {
-		diceImgDOM.style.display = 'none';
-		dice = Math.ceil(Math.random() * 6);
-		diceImgDOM.src = `dice-${dice}.png`;
+		// diceImgDOM.style.display = 'none';
+		diceImgsDOM.style.display = 'none';
+		// dice = Math.ceil(Math.random() * 6);
+		dice1 = Math.ceil(Math.random() * 6);
+		dice2 = Math.ceil(Math.random() * 6);
+		// diceImgDOM.src = `dice-${dice}.png`;
+		dice1ImgDOM.src = `dice-${dice1}.png`;
+		dice2ImgDOM.src = `dice-${dice2}.png`;
 		window.setTimeout(() => {
-			diceImgDOM.style.display = 'block';
+			// diceImgDOM.style.display = 'block';
+			diceImgsDOM.style.display = 'block';
 
-			if (dice > 1) {
-				if (previousDice === 6 && dice === 6) switchTurn(true);
+			// if (dice > 1) {
+			if ( dice1 > 1 && dice2 > 1 )
+			{
+				// if (previousDice === 6 && dice === 6) switchTurn(true);
+				if ( dice1 === 6 && dice2 === 6 ) switchTurn( true );
 
-				previousDice = dice;
-				roundScore += dice;
+				// previousDice = dice;
+				// roundScore += dice;
+				roundScore += dice1 + dice2;
 				document.getElementById(`current-${activePlayer}`).textContent = roundScore;
 				totalCurrentScore = (document.getElementById(`score-${activePlayer}`).textContent * 1) + roundScore;
 				winCheck();
