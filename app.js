@@ -10,8 +10,7 @@ GAME RULES:
 */
 
 /* VARIABLES */
-const winScore = 100;
-let dice, activePlayer, roundScore, globalScores, totalCurrentScore, gotWinner, previousDice;
+let dice, activePlayer, roundScore, globalScores, totalCurrentScore, gotWinner, previousDice, finalScore;
 
 /* DOM ELEMENTS */
 const playerPanel0 = document.querySelector('.player-0-panel');
@@ -24,6 +23,7 @@ const diceImgDOM = document.querySelector('img.dice');
 const rollDiceDOM = document.querySelector('button.btn-roll');
 const holdDOM = document.querySelector('button.btn-hold');
 const newGameDOM = document.querySelector('button.btn-new');
+const finalScoreDOM = document.querySelector( '.final-score' );
 
 window.setGlobalScoreForPlayer0 = () => globalScoreDOM0.textContent = totalCurrentScore;
 function setGlobalScoreForPlayer1() { globalScoreDOM1.textContent = totalCurrentScore; }
@@ -31,7 +31,7 @@ function setGlobalScoreForPlayer1() { globalScoreDOM1.textContent = totalCurrent
 const init = () => {
 	if (gotWinner) {
 		document.querySelector(`.player-${activePlayer}-panel`).classList.remove('winner');
-		document.querySelector(`.player-${activePlayer}-panel`).classList.remove('active');
+		// document.querySelector(`.player-${activePlayer}-panel`).classList.remove('active');
 		document.getElementById(`name-${activePlayer}`).textContent = `Player ${activePlayer + 1}`;
 	}
 	activePlayer = 0;
@@ -48,8 +48,19 @@ const init = () => {
 	diceImgDOM.style.display = 'none';
 	playerPanel0.classList.add('active');
 	holdDOM.disabled = false;
+	finalScoreDOM.disabled = false;
+	finalScoreDOM.select();
+	finalScoreDOM.focus();
 };
 init();
+
+finalScoreDOM.addEventListener( 'focusout', () =>
+{
+	if ( ! finalScoreDOM.value ) finalScoreDOM.value = 100;
+
+	finalScore = finalScoreDOM.value;
+	finalScoreDOM.disabled = true;
+});
 
 const switchTurn = (rolled2Sixes = false) => {
 	playerPanel0.classList.toggle('active');
@@ -68,7 +79,8 @@ const switchTurn = (rolled2Sixes = false) => {
 };
 
 const winCheck = () => {
-	if (totalCurrentScore >= winScore) {
+	if ( totalCurrentScore >= ( finalScoreDOM.value || 100 ) )
+	{
 		document.getElementById(`name-${activePlayer}`).textContent = 'Winner!';
 		document.querySelector(`.player-${activePlayer}-panel`).classList.remove('active');
 		document.querySelector(`.player-${activePlayer}-panel`).classList.add('winner');
@@ -78,7 +90,12 @@ const winCheck = () => {
 	}
 };
 
-const rollDice = () => {
+const rollDice = () =>
+{
+	gameStarted = true;
+	if ( ! finalScoreDOM.value ) finalScoreDOM.value = 100;
+	if ( ! finalScoreDOM.disabled ) finalScoreDOM.disabled = true;
+
 	if (!gotWinner) {
 		diceImgDOM.style.display = 'none';
 		dice = Math.ceil(Math.random() * 6);
